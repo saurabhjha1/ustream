@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ustream app</title>
+	<link rel="icon" type="image/png" href="fav.png">
+	<link rel="shortcut icon" type="image/png" href="fav.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="fav.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="fav.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="fav.png">
+	<link rel="mask-icon" href="fav.png">
+	<style>
+		.button {
+		  background-color: #4CAF50; /* Green */
+		  border: none;
+		  color: white;
+		  padding: 15px 32px;
+		  text-align: center;
+		  text-decoration: none;
+		  display: inline-block;
+		  margin: 4px 2px;
+		  cursor: pointer;
+		}
+		.button5 {font-size: 24px;}
+		</style>
+</head>
+
+<body>
+	<span color="red">Is remote computer running your job: {{msg}}  </span>
+	<h2> Here are your options: </h2>
+
+	
+	<form method="post" action="/">
+		<input class="button button5" type="submit" value="start zoom on remote machine" name="action1" />
+		<input class="button button5" type="submit" value="stop zoom on remote machine" name="action2" />
+	</form>
+	
+
+	<form action="{{meeting}}">
+		<input class="button button5" type="submit" value="Join meeting from your device!">
+	</form>
+
+</body>
+
+</html>

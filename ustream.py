@@ -3,10 +3,10 @@ import os
 import sys
 import subprocess as subp
 import logging 
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for, request, render_template, send_from_directory
 import json
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="web/")
 
 def parse_config():
     fname = os.path.realpath(os.path.dirname(__file__)) + os.sep + "config.json"
@@ -36,13 +36,28 @@ def is_running():
         return False
 
 
-@app.route('/')
-def get_zoom_status():
-   if is_running():
-       return "zoom is running", 200
-   else:
-       return "zoom is not running", 200
-
+@app.route("/", methods=['GET', 'POST'])
+def index():
+    config = parse_config()
+    meetingId = config['id']
+    meeting = f"https://zoom.us/j/{meetingId}"
+    msg = ""
+    status = 200
+    if request.method == 'POST':
+        if request.form.get('action1'):
+            msg, status = launch_zoom()
+            
+        elif  request.form.get('action2'):
+            msg, status = stop_zoom()
+        return render_template('index.html', msg=msg, meeting=meeting)
+    elif request.method == 'GET':
+        if is_running():
+            msg, status = "zoom is running", 200
+        else:
+            msg, status = "zoom is not running", 200
+        return render_template('index.html', msg=msg, meeting=meeting)
+    
+    return render_template("index.html")
 
 @app.route('/start')
 def launch_zoom():
@@ -57,7 +72,7 @@ def launch_zoom():
 
         if zoom.returncode == 0:
             persist_state("run")
-            return "success"
+            return "success", 200
         else:
             return "could not launch", 404
     else:
@@ -73,14 +88,19 @@ def stop_zoom():
         if zkill.returncode == 1:
             if "no process" in status:
                 persist_state("stop")
-                return "zoom already killed deleting state", 200
+                return "zoom already stop deleting state", 200
             else:
-                return "failed to kill", 200
+                return "failed to stop zoom", 200
         elif zkill.returncode == 0:
             persist_state("stop")
-            return "success", 200
+            return "stopped zoom", 200
     else:
-        return "not running", 200
+        return "zoom is not running", 200
+
+@app.route('/fav.png')
+def favicon():
+    logging.info(app.root_path)
+    return send_from_directory(os.path.join(app.root_path, 'web'), 'fav.png')
 
 if __name__ == '__main__':
     logging.info("started the app")
