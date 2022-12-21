@@ -36,7 +36,8 @@ def is_running():
         return False
 
 
-@app.route('/'):
+@app.route('/')
+def get_zoom_status():
    if is_running():
        return "zoom is running", 200
    else:
